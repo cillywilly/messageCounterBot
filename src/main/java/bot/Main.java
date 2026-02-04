@@ -15,4 +15,5 @@ public class Main {
         System.out.println("H2 Console available at: http://localhost:8080/h2-console");
     }
 
+
 }

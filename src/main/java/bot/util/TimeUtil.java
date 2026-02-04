@@ -1,9 +1,8 @@
-package util;
+package bot.util;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class TimeUtil {
 

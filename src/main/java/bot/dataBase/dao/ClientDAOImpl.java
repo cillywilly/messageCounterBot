@@ -1,13 +1,13 @@
 package bot.dataBase.dao;
 
 import bot.dataBase.entity.Client;
+import bot.util.TimeUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import util.TimeUtil;
 
 @Repository
 public class ClientDAOImpl implements ClientDAO {
