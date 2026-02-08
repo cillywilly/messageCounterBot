@@ -3,13 +3,18 @@ package bot;
 import bot.dataBase.dao.GameResultDAO;
 import bot.dataBase.entity.TableTennisGameResult;
 import bot.util.TournamentResultUtil;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,6 +27,8 @@ public class TableTennis {
     GameResultDAO gameResultDAO;
     @Autowired
     TournamentResultUtil tournamentResultUtil;
+    @Autowired
+    ResourceLoader resourceLoader;
     TelegramBot telegramBot;
     private String player1;
     private String player2;
@@ -36,6 +43,26 @@ public class TableTennis {
         myExecute(sendMessage);
     }
 
+    public void trySendPhoto(byte[] imgAddress, String chatId) {
+        SendPhoto sendPhoto = new SendPhoto();
+        sendPhoto.setChatId(chatId);
+        myExecute(imgAddress, sendPhoto);
+    }
+
+    @SneakyThrows
+    private void myExecute(byte[] imgAddress, SendPhoto sendPhoto) {
+        try {
+            InputFile photoFile = new InputFile(
+                    new ByteArrayInputStream(imgAddress),
+                    "table_" + System.currentTimeMillis() + ".png"
+            );
+            sendPhoto.setPhoto(photoFile);
+            telegramBot.execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void myExecute(SendMessage sendMessage) {
         try {
             Thread.sleep(500);
@@ -47,9 +74,10 @@ public class TableTennis {
 
     public void getTournament(String tournamentName, TelegramBot telegramBot, String chatId) {
         var tournament = gameResultDAO.getTournament(tournamentName);
-        var res = tournamentResultUtil.getFormattedResult(tournament);
+//        var res = tournamentResultUtil.getFormattedResult(tournament);
+        var resultPng = tournamentResultUtil.getFormattedResultPng(tournament);
         this.telegramBot = telegramBot;
-        send(res, chatId);
+        trySendPhoto(resultPng, chatId);
     }
 
     public void addGameResult(Update update) {
@@ -117,7 +145,29 @@ public class TableTennis {
                 createGame("Григорьев", "Водяхин", 3, 1),
                 createGame("Сидоров", "Петров", 0, 3),
                 createGame("Петров", "Сидоров", 2, 3),
-                createGame("Галкин", "Петров", 3, 1)
+                createGame("Галкин", "Петров", 3, 1),
+                createGame("Иванов", "Орлов", 3, 1),
+                createGame("Кузнецов", "Никитин", 3, 1),
+                createGame("Попов", "Степанов", 3, 1),
+                createGame("Васильев", "Козлов", 3, 1),
+                createGame("Морозов", "Егоров", 3, 1),
+                createGame("Николаев", "Дмитриев", 3, 1),
+                createGame("Михайлов", "Борисов", 3, 1),
+                createGame("Фёдоров", "Григорьев", 3, 1),
+                createGame("Алексеев", "Лебедев", 3, 1),
+                createGame("Лебедев", "Алексеев", 1, 3),
+                createGame("Григорьев", "Фёдоров", 3, 1),
+                createGame("Борисов", "Михайлов", 3, 1),
+                createGame("Дмитриев", "Николаев", 3, 1),
+                createGame("Егоров", "Морозов", 3, 1),
+                createGame("Павлов", "Петров", 3, 1),
+                createGame("Козлов", "Степанов", 3, 1),
+                createGame("Степанов", "Никитин", 3, 1),
+                createGame("Никитин", "Орлов", 3, 1),
+                createGame("Орлов", "Титов", 3, 1),
+                createGame("Титов", "Андреев", 3, 1),
+                createGame("Макаров", "Лазарев", 3, 1),
+                createGame("Лазарев", "Макаров", 3, 1)
         );
 
         for (TableTennisGameResult game : testData) {
